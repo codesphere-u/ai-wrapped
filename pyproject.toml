@@ -1,0 +1,73 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-wrapped"
+version = "1.0.0"
+description = "100% offline ChatGPT, Claude & Gemini Wrapped generator + Portable AI Brain migrator with zero cloud uploads."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "codesphere-u" }]
+keywords = [
+  "ai-wrapped",
+  "chatgpt-export",
+  "claude-export",
+  "gemini-takeout",
+  "ai-memory",
+  "agent-skills",
+  "privacy-first",
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Console",
+  "Intended Audience :: End Users/Desktop",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Utilities",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/codesphere-u/ai-wrapped"
+Repository = "https://github.com/codesphere-u/ai-wrapped"
+Issues = "https://github.com/codesphere-u/ai-wrapped/issues"
+
+[project.scripts]
+ai-wrapped = "ai_wrapped:main"
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=9.0.3,<10",
+  "ruff>=0.8,<1",
+  "mypy>=1.13,<2",
+]
+
+[tool.setuptools]
+py-modules = ["ai_wrapped"]
+
+[tool.setuptools.package-dir]
+"" = "skills/ai-wrapped/scripts"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_unused_configs = true
+files = ["skills/ai-wrapped/scripts/ai_wrapped.py"]

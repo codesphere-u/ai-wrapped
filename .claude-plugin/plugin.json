@@ -1,0 +1,22 @@
+{
+  "name": "ai-wrapped",
+  "version": "1.0.0",
+  "icon": "./.claude-plugin/icon.png",
+  "description": "100% offline ChatGPT, Claude & Gemini Wrapped story generator and Portable AI Brain migrator with zero cloud uploads.",
+  "author": {
+    "name": "codesphere-u",
+    "url": "https://github.com/codesphere-u"
+  },
+  "repository": "https://github.com/codesphere-u/ai-wrapped",
+  "license": "MIT",
+  "keywords": [
+    "agent-skills",
+    "ai-wrapped",
+    "chatgpt",
+    "claude",
+    "gemini",
+    "memory-migration",
+    "privacy"
+  ],
+  "skills": "./skills/"
+}

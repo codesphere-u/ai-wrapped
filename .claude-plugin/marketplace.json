@@ -1,0 +1,22 @@
+{
+  "name": "ai-wrapped-marketplace",
+  "description": "Offline ChatGPT, Claude, and Gemini Wrapped story generator and Portable Brain memory migrator.",
+  "owner": {
+    "name": "codesphere-u",
+    "url": "https://github.com/codesphere-u"
+  },
+  "plugins": [
+    {
+      "name": "ai-wrapped",
+      "source": "./",
+      "description": "Turn your ChatGPT, Claude & Gemini export ZIP into an offline interactive Wrapped HTML story and Portable Brain brief.",
+      "version": "1.0.0",
+      "author": {
+        "name": "codesphere-u"
+      },
+      "repository": "https://github.com/codesphere-u/ai-wrapped",
+      "license": "MIT",
+      "strict": false
+    }
+  ]
+}

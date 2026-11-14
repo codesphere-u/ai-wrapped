@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint-type-audit:
+    name: Lint, Typecheck & Security Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies & run checks
+        run: |
+          uv venv .venv
+          uv pip install --python .venv/bin/python -e ".[dev]" pip-audit
+          .venv/bin/ruff check .
+          .venv/bin/mypy
+          .venv/bin/pip-audit --skip-editable
+
+      - name: Verify zero-install --demo pipeline
+        run: |
+          python3 skills/ai-wrapped/scripts/ai_wrapped.py --demo --output-dir /tmp/wrapped-ci
+          test -s /tmp/wrapped-ci/ai-wrapped.html
+          test -s /tmp/wrapped-ci/BRAIN_PORTABLE.md
+          test -s /tmp/wrapped-ci/wrapped-summary.json
+
+  test-matrix:
+    name: Test Matrix (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run pytest
+        run: |
+          uv venv .venv
+          uv pip install --python .venv/bin/python -e ".[dev]"
+          .venv/bin/pytest -v
+
+  docker-smoke:
+    name: Docker Build & Non-Root Verification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build and verify non-root container
+        run: |
+          docker build -t ai-wrapped:ci .
+          docker run --rm --user 10001 -v /tmp:/data ai-wrapped:ci --demo --output-dir /data/out
+          test -s /tmp/out/ai-wrapped.html
+          test -s /tmp/out/BRAIN_PORTABLE.md
