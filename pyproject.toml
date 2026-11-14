@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ai-wrapped"
-version = "1.0.0"
+version = "1.0.1"
 description = "100% offline ChatGPT, Claude & Gemini Wrapped generator + Portable AI Brain migrator with zero cloud uploads."
 readme = "README.md"
 license = "MIT"

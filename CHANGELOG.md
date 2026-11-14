@@ -5,6 +5,14 @@ All notable changes to **AI Wrapped** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-11-14
+
+### Fixed & Hardened
+- **Keyword Secret Stripping**: Redacts API tokens (`sk-`, `hf_`, `gsk_`, `pplx-`, JWTs, Bearer headers, emails) *before* frequency tokenization so secret substrings can never surface inside `top_keywords` or `BRAIN_PORTABLE.md`.
+- **Real-World Export Resilience**: Broadens `--auto` discovery in `~/Downloads` to inspect OpenAI/Claude UUID-named `.zip` exports and extracted export folders via ZIP central-directory detection while tolerating broken symlinks; supports broader ChatGPT sharded filenames (`conversations-*.json`), `Bard` Takeout history, non-UTC Takeout timestamp suffixes (`PST`, `EST`, `GMT+03:00`), and skips ChatGPT internal tool-call JSON payloads (`recipient != all`).
+- **Deduplication & Bounded Reads**: Deduplicates overlapping ZIP + unzipped JSON archives inside the same directory, enforces true byte limits on decompressed ZIP streams against spoofed `ZipInfo.file_size` headers, and halts nested folder traversal cleanly at `MAX_CONVERSATIONS`.
+- **Browser Offline (`file://`) & Timezone UX**: Adds `--tz utc|local` for displaying hourly activity in local clock time, `execCommand('copy')` clipboard fallback when opening `ai-wrapped.html` directly over `file://`, a slide progress indicator (`1 / 7`), responsive word wrapping on mobile, and `<`/`>`/`&` script-tag escaping.
+
 ## [1.0.0] - 2026-11-14
 
 ### Added

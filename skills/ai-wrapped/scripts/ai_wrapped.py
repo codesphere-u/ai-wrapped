@@ -12,8 +12,8 @@ from __future__ import annotations
 
 import argparse
 import dataclasses
+import hashlib
 import html
-import io
 import json
 import math
 import os
@@ -26,7 +26,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Literal
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 
 MAX_ZIP_MEMBER_BYTES = 200 * 1024 * 1024
 MAX_TEXT_FILE_BYTES = 120 * 1024 * 1024
@@ -42,6 +42,7 @@ EXCLUDED_DIRS = {
     ".pytest_cache",
     ".mypy_cache",
     ".ruff_cache",
+    "ai-wrapped-out",
     "Library",
     "AppData",
     "Applications",
@@ -142,12 +143,14 @@ STOPWORDS = {
 }
 
 SECRET_REDACT_PATTERNS: list[tuple[re.Pattern[str], str]] = [
-    (re.compile(r"\bsk-(?:proj-|ant-|live-|test-)?[A-Za-z0-9_-]{12,}\b"), "[redacted-api-key]"),
-    (re.compile(r"\b(?:ghp|gho|ghu|ghs|github_pat)_[A-Za-z0-9_]{16,}\b"), "[redacted-token]"),
+    (re.compile(r"\bsk-(?:proj-|ant-|live-|test-|svcacct-)?[A-Za-z0-9_-]{12,}\b"), "[redacted-api-key]"),
+    (re.compile(r"\b(?:ghp|gho|ghu|ghs|github_pat|hf|gsk|npm)_[A-Za-z0-9_]{16,}\b"), "[redacted-token]"),
+    (re.compile(r"\bpplx-[A-Za-z0-9_-]{16,}\b"), "[redacted-api-key]"),
     (re.compile(r"\bAIza[0-9A-Za-z_-]{20,}\b"), "[redacted-google-key]"),
     (re.compile(r"\bxox[baprs]-[0-9A-Za-z-]{10,}\b"), "[redacted-slack-token]"),
     (re.compile(r"\bAKIA[0-9A-Z]{16}\b"), "[redacted-aws-key]"),
-    (re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._-]{16,}\b"), "Bearer [redacted]"),
+    (re.compile(r"\beyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}\b"), "[redacted-jwt]"),
+    (re.compile(r"(?i)\bBearer\s+[A-Za-z0-9._~+/-]{16,}=*"), "Bearer [redacted]"),
     (re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"), "[redacted-email]"),
     (re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), "[redacted-ssn]"),
     (re.compile(r"\b(?:\d[ -]*?){13,19}\b"), "[redacted-number]"),
@@ -208,13 +211,21 @@ def strip_html_tags(raw_html: str) -> str:
     return parser.get_text()
 
 
-def sanitize_preview(text: str, max_len: int = 120) -> str:
-    cleaned = " ".join(text.split())
+def _redact_secrets(text: str, *, strip_secrets: bool = False) -> str:
+    cleaned = text
     for pat, repl in SECRET_REDACT_PATTERNS:
-        cleaned = pat.sub(repl, cleaned)
+        cleaned = pat.sub(" " if strip_secrets else repl, cleaned)
+    return cleaned
+
+
+def sanitize_preview(text: str, max_len: int = 120) -> str:
+    cleaned = _redact_secrets(" ".join(text.split()))
     if len(cleaned) > max_len:
         cleaned = cleaned[: max_len - 1].rstrip() + "…"
     return cleaned
+
+
+_TZ_SUFFIX_RE = re.compile(r"\s+(?:[A-Z]{2,5}|(?:GMT|UTC)[+-]\d{1,2}(?::\d{2})?)$")
 
 
 def parse_timestamp(val: Any) -> datetime | None:
@@ -230,24 +241,35 @@ def parse_timestamp(val: Any) -> datetime | None:
         except (OSError, OverflowError, ValueError):
             return None
     if isinstance(val, str):
-        s = val.strip()
+        s = val.strip().replace("\u202f", " ").replace("\xa0", " ")
         if not s:
             return None
-        if s.endswith("Z"):
-            s = s[:-1] + "+00:00"
-        # Google Takeout plain English timestamps fallback
-        for fmt in (
-            None,
+        iso_candidate = s[:-1] + "+00:00" if s.endswith("Z") else s
+        try:
+            dt = datetime.fromisoformat(iso_candidate)
+            return dt.astimezone(timezone.utc) if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
+        except ValueError:
+            pass
+        # Google Takeout plain English / localized timestamps fallback (including PST/EST/GMT+3)
+        candidates = (s, _TZ_SUFFIX_RE.sub("", s).strip())
+        formats = (
             "%b %d, %Y, %I:%M:%S %p %Z",
             "%b %d, %Y, %I:%M:%S %p",
+            "%b %d, %Y, %H:%M:%S %Z",
+            "%b %d, %Y, %H:%M:%S",
+            "%d %b %Y, %H:%M:%S",
             "%Y-%m-%d %H:%M:%S",
             "%Y-%m-%d",
-        ):
-            try:
-                dt = datetime.fromisoformat(s) if fmt is None else datetime.strptime(s.replace("\u202f", " "), fmt)
-                return dt if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
-            except ValueError:
+        )
+        for cand in candidates:
+            if not cand:
                 continue
+            for fmt in formats:
+                try:
+                    dt = datetime.strptime(cand, fmt)
+                    return dt.astimezone(timezone.utc) if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
+                except ValueError:
+                    continue
     return None
 
 
@@ -315,7 +337,12 @@ def _parse_chatgpt_list(data: list[Any], source_label: str = "ChatGPT") -> list[
             role_raw = author.get("role") if isinstance(author, dict) else None
             if role_raw not in {"user", "assistant"}:
                 continue
-            text = _extract_chatgpt_text(msg.get("content"))
+            recipient = msg.get("recipient")
+            content_obj = msg.get("content")
+            content_type = content_obj.get("content_type") if isinstance(content_obj, dict) else None
+            if role_raw == "assistant" and isinstance(recipient, str) and recipient not in {"", "all"} and content_type != "text":
+                continue
+            text = _extract_chatgpt_text(content_obj)
             if not text:
                 continue
             meta = msg.get("metadata")
@@ -419,9 +446,9 @@ def _parse_gemini_activity_json(data: list[Any]) -> list[Conversation]:
     for idx, entry in enumerate(data):
         if not isinstance(entry, dict):
             continue
-        header = str(entry.get("header") or "")
+        header = str(entry.get("header") or "").lower()
         title_raw = str(entry.get("title") or "")
-        if "gemini" not in header.lower() and not title_raw.lower().startswith("prompted "):
+        if "gemini" not in header and "bard" not in header and not title_raw.lower().startswith("prompted "):
             # Check explicit Gemini contents schema
             if isinstance(entry.get("contents"), list):
                 turns: list[Turn] = []
@@ -503,7 +530,10 @@ def _parse_gemini_takeout_html(raw_html: str) -> list[Conversation]:
         body_lines = [
             ln
             for ln in lines
-            if ln != prompt_line and "gemini apps" not in ln.lower() and parse_timestamp(ln) is None
+            if ln != prompt_line
+            and "gemini apps" not in ln.lower()
+            and "bard" not in ln.lower()
+            and parse_timestamp(ln) is None
         ]
         turns = [Turn(role="user", text=prompt_text, timestamp=ts)]
         if body_lines:
@@ -701,28 +731,58 @@ def parse_markdown_transcript(raw_text: str, rel_name: str, mtime: datetime | No
     ]
 
 
+def _is_export_json_name(lower_path: str, base_name: str) -> bool:
+    return (
+        base_name.startswith("conversations")
+        or "activity" in base_name
+        or "gemini" in lower_path
+        or "bard" in lower_path
+    )
+
+
+def _is_export_html_name(lower_path: str, base_name: str) -> bool:
+    return "activity" in base_name or "gemini" in lower_path or "bard" in lower_path
+
+
+def _read_zip_member_text(zf: zipfile.ZipFile, info: zipfile.ZipInfo) -> str | None:
+    if info.is_dir() or ".." in Path(info.filename).parts or info.file_size > MAX_ZIP_MEMBER_BYTES:
+        return None
+    with zf.open(info, "r") as fh:
+        raw_bytes = fh.read(MAX_ZIP_MEMBER_BYTES + 1)
+    if len(raw_bytes) > MAX_ZIP_MEMBER_BYTES:
+        return None
+    return raw_bytes.decode("utf-8", errors="ignore")
+
+
+def _zip_looks_like_export(zip_path: Path) -> bool:
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            for info in zf.infolist():
+                if info.is_dir():
+                    continue
+                lower = info.filename.lower()
+                base = Path(lower).name
+                if (lower.endswith(".json") and _is_export_json_name(lower, base)) or (
+                    lower.endswith(".html") and _is_export_html_name(lower, base)
+                ):
+                    return True
+    except (OSError, zipfile.BadZipFile):
+        return False
+    return False
+
+
 def _load_zip_archive(zip_path: Path) -> tuple[list[Conversation], list[str]]:
     convs: list[Conversation] = []
     sources: list[str] = []
     try:
         with zipfile.ZipFile(zip_path, "r") as zf:
             for info in sorted(zf.infolist(), key=lambda i: i.filename):
-                if info.is_dir():
-                    continue
-                if ".." in Path(info.filename).parts:
-                    continue
-                if info.file_size > MAX_ZIP_MEMBER_BYTES:
-                    continue
                 lower = info.filename.lower()
                 base = Path(lower).name
-                if base.endswith(".json") and (
-                    base == "conversations.json"
-                    or re.fullmatch(r"conversations-\d+\.json", base)
-                    or "activity" in base
-                    or "gemini" in lower
-                ):
-                    with zf.open(info, "r") as fh:
-                        raw = io.TextIOWrapper(fh, encoding="utf-8", errors="ignore").read()
+                if base.endswith(".json") and _is_export_json_name(lower, base):
+                    raw = _read_zip_member_text(zf, info)
+                    if raw is None:
+                        continue
                     try:
                         parsed_json = json.loads(raw)
                     except json.JSONDecodeError:
@@ -731,16 +791,31 @@ def _load_zip_archive(zip_path: Path) -> tuple[list[Conversation], list[str]]:
                     if found:
                         convs.extend(found)
                         sources.append(f"{zip_path.name}:{info.filename}")
-                elif lower.endswith(".html") and ("activity" in base or "gemini" in lower):
-                    with zf.open(info, "r") as fh:
-                        raw_html = io.TextIOWrapper(fh, encoding="utf-8", errors="ignore").read()
+                elif lower.endswith(".html") and _is_export_html_name(lower, base):
+                    raw_html = _read_zip_member_text(zf, info)
+                    if raw_html is None:
+                        continue
                     found = _parse_gemini_takeout_html(raw_html)
                     if found:
                         convs.extend(found)
                         sources.append(f"{zip_path.name}:{info.filename}")
+                if len(convs) >= MAX_CONVERSATIONS:
+                    break
     except (OSError, zipfile.BadZipFile):
         return [], []
     return convs, sources
+
+
+def _conversation_dedup_key(conv: Conversation) -> tuple[str, str]:
+    synthetic_prefixes = ("cgpt-", "claude-", "gemini-", "generic-", "jsonl-", "md-")
+    if conv.conv_id and not conv.conv_id.startswith(synthetic_prefixes):
+        return (conv.platform, conv.conv_id)
+    first_text = conv.turns[0].text[:160] if conv.turns else ""
+    ts_str = conv.created_at.isoformat() if conv.created_at else ""
+    digest = hashlib.sha1(
+        f"{conv.title}|{ts_str}|{len(conv.turns)}|{first_text}".encode("utf-8", errors="ignore")
+    ).hexdigest()
+    return (conv.platform, digest)
 
 
 def load_conversations_from_target(
@@ -749,7 +824,21 @@ def load_conversations_from_target(
     include_agents: bool = False,
 ) -> tuple[list[Conversation], list[str]]:
     convs: list[Conversation] = []
+    seen_keys: set[tuple[str, str]] = set()
     sources: list[str] = []
+
+    def _add_unique(found: list[Conversation], src_label: str) -> None:
+        added = False
+        for c in found:
+            if len(convs) >= MAX_CONVERSATIONS:
+                break
+            key = _conversation_dedup_key(c)
+            if key not in seen_keys:
+                seen_keys.add(key)
+                convs.append(c)
+                added = True
+        if added and src_label not in sources:
+            sources.append(src_label)
 
     def _consume_file(fpath: Path, *, allow_md: bool = False) -> None:
         if len(convs) >= MAX_CONVERSATIONS or fpath.is_symlink() or not fpath.is_file():
@@ -762,8 +851,8 @@ def load_conversations_from_target(
 
         if lower.endswith(".zip"):
             z_convs, z_srcs = _load_zip_archive(fpath)
-            convs.extend(z_convs)
-            sources.extend(z_srcs)
+            if z_convs:
+                _add_unique(z_convs, ", ".join(z_srcs[:4]))
             return
 
         if lower.endswith(".json"):
@@ -775,11 +864,10 @@ def load_conversations_from_target(
                 return
             found = parse_json_payload(data)
             if found:
-                convs.extend(found)
-                sources.append(fpath.name)
+                _add_unique(found, fpath.name)
             return
 
-        if lower.endswith(".html") and ("activity" in lower or "gemini" in str(fpath).lower()):
+        if lower.endswith(".html") and _is_export_html_name(str(fpath).lower(), lower):
             if size > MAX_TEXT_FILE_BYTES:
                 return
             try:
@@ -787,8 +875,7 @@ def load_conversations_from_target(
             except OSError:
                 return
             if found:
-                convs.extend(found)
-                sources.append(fpath.name)
+                _add_unique(found, fpath.name)
             return
 
         if lower.endswith(".jsonl") and size <= MAX_JSONL_BYTES:
@@ -800,8 +887,7 @@ def load_conversations_from_target(
             except OSError:
                 return
             if found:
-                convs.extend(found)
-                sources.append(fpath.name)
+                _add_unique(found, fpath.name)
             return
 
         if allow_md and lower.endswith((".md", ".txt")) and size <= 5 * 1024 * 1024:
@@ -815,8 +901,7 @@ def load_conversations_from_target(
             except OSError:
                 return
             if found:
-                convs.extend(found)
-                sources.append(fpath.name)
+                _add_unique(found, fpath.name)
 
     if target.is_file():
         _consume_file(target, allow_md=True)
@@ -834,27 +919,39 @@ def load_conversations_from_target(
                 if lower.endswith((".zip", ".jsonl")) or (
                     lower.endswith(".json")
                     and (
-                        lower == "conversations.json"
-                        or bool(re.fullmatch(r"conversations-\d+\.json", lower))
-                        or "activity" in lower
+                        _is_export_json_name(lower, lower)
                         or "wrapped" in lower
                         or "export" in lower
                     )
-                ) or (lower.endswith((".html", ".md", ".txt")) and "readme" not in lower and "portable" not in lower):
+                ) or (
+                    lower.endswith((".html", ".md", ".txt"))
+                    and "readme" not in lower
+                    and "portable" not in lower
+                    and "changelog" not in lower
+                    and "license" not in lower
+                ):
                     _consume_file(fpath, allow_md=lower.endswith((".md", ".txt")))
                     if len(convs) >= MAX_CONVERSATIONS:
+                        dirnames.clear()
                         break
 
     if include_agents:
-        home = Path.home()
-        for agent_dir in (home / ".claude" / "projects", home / ".codex" / "sessions"):
-            if agent_dir.is_dir() and agent_dir.resolve() != target.resolve():
+        resolved_target = target.resolve()
+        for agent_dir in _iter_local_agent_dirs():
+            if agent_dir.resolve() != resolved_target:
                 for root_s, _, files in os.walk(agent_dir):
                     for fn in sorted(files):
                         if fn.endswith(".jsonl"):
                             _consume_file(Path(root_s) / fn)
+                            if len(convs) >= MAX_CONVERSATIONS:
+                                return convs[:MAX_CONVERSATIONS], sources
 
     return convs[:MAX_CONVERSATIONS], sources
+
+
+def _iter_local_agent_dirs() -> list[Path]:
+    home = Path.home()
+    return [d for d in (home / ".claude" / "projects", home / ".codex" / "sessions") if d.is_dir()]
 
 
 def build_demo_conversations() -> tuple[list[Conversation], list[str]]:
@@ -1146,18 +1243,27 @@ def _pick_archetype(
     )
 
 
+def _to_display_dt(dt: datetime, tz_mode: Literal["utc", "local"]) -> datetime:
+    if tz_mode == "local":
+        return dt.astimezone()
+    return dt.astimezone(timezone.utc) if dt.tzinfo is not None else dt.replace(tzinfo=timezone.utc)
+
+
 def analyze_conversations(
     conversations: list[Conversation],
     sources: list[str],
     *,
     year: int | None = None,
+    tz_mode: Literal["utc", "local"] = "utc",
 ) -> dict[str, Any]:
     """Compute deterministic analytics, archetype, unfinished loops, and style signals."""
+    tz_label = "Local" if tz_mode == "local" else "UTC"
     filtered: list[Conversation] = []
     for conv in conversations:
         if year is not None:
-            year_turns = [t for t in conv.turns if t.timestamp and t.timestamp.year == year]
-            if not year_turns and not (conv.created_at and conv.created_at.year == year):
+            year_turns = [t for t in conv.turns if t.timestamp and _to_display_dt(t.timestamp, tz_mode).year == year]
+            conv_year = _to_display_dt(conv.created_at, tz_mode).year if conv.created_at else None
+            if not year_turns and conv_year != year:
                 continue
             filtered.append(
                 dataclasses.replace(
@@ -1199,6 +1305,7 @@ def analyze_conversations(
                 "hours": [0] * 24,
                 "weekdays": [0] * 7,
                 "peak_hour": 12,
+                "tz_label": tz_label,
                 "night_owl_pct": 0.0,
                 "morning_pct": 0.0,
                 "two_am_rabbit_holes": 0,
@@ -1256,13 +1363,14 @@ def analyze_conversations(
             longest_chat_turns = len(conv.turns)
             longest_chat_title = sanitize_preview(conv.title, 80)
 
-        conv_user_blob: list[str] = [conv.title]
+        conv_user_blob: list[str] = [_redact_secrets(conv.title, strip_secrets=True)]
         for turn in conv.turns:
-            words = re.findall(r"[A-Za-z0-9']+", turn.text)
+            safe_text = _redact_secrets(turn.text, strip_secrets=True)
+            words = re.findall(r"[^\W_]+(?:'[^\W_]+)*", safe_text)
             if turn.role == "user":
                 user_turns += 1
                 user_words += len(words)
-                conv_user_blob.append(turn.text)
+                conv_user_blob.append(safe_text)
                 if POLITE_RE.search(turn.text):
                     polite_hits += 1
                 if URGENT_RE.search(turn.text):
@@ -1272,17 +1380,18 @@ def analyze_conversations(
                         style_hits[key] += 1
                         style_desc[key] = desc
                 for tok in words:
-                    low = tok.lower().strip("'")
+                    low = tok.lower().replace("'", "")
                     if len(low) >= 4 and low not in STOPWORDS and not low.isdigit():
                         keyword_counts[low] += 1
                 if turn.timestamp is not None:
+                    disp_dt = _to_display_dt(turn.timestamp, tz_mode)
                     timed_user_turns += 1
-                    all_dates.append(turn.timestamp)
-                    hr = turn.timestamp.hour
+                    all_dates.append(disp_dt)
+                    hr = disp_dt.hour
                     hours[hr] += 1
-                    weekdays[turn.timestamp.weekday()] += 1
-                    day_turns[turn.timestamp.strftime("%Y-%m-%d")] += 1
-                    month_turns[turn.timestamp.strftime("%Y-%m")] += 1
+                    weekdays[disp_dt.weekday()] += 1
+                    day_turns[disp_dt.strftime("%Y-%m-%d")] += 1
+                    month_turns[disp_dt.strftime("%Y-%m")] += 1
                     if 2 <= hr <= 4:
                         two_am_count += 1
                     if hr >= 22 or hr <= 4:
@@ -1319,14 +1428,18 @@ def analyze_conversations(
         combined = f"{conv.title} " + " ".join(t.text for t in conv.turns if t.role == "user")[:500]
         if UNFINISHED_ACTION_RE.search(combined):
             last_user = next((t.text for t in reversed(conv.turns) if t.role == "user"), "")
-            stale_days = (max_dt - conv.updated_at).days if (max_dt and conv.updated_at) else None
+            stale_days = (
+                (max_dt - _to_display_dt(conv.updated_at, tz_mode)).days if (max_dt and conv.updated_at) else None
+            )
             unfinished.append(
                 {
                     "title": sanitize_preview(conv.title, 76),
                     "platform": conv.platform,
                     "turns": len(conv.turns),
                     "last_prompt": sanitize_preview(last_user, 110),
-                    "last_active": conv.updated_at.strftime("%Y-%m-%d") if conv.updated_at else None,
+                    "last_active": _to_display_dt(conv.updated_at, tz_mode).strftime("%Y-%m-%d")
+                    if conv.updated_at
+                    else None,
                     "stale_days": stale_days,
                 }
             )
@@ -1398,6 +1511,7 @@ def analyze_conversations(
             "hours": hours,
             "weekdays": weekdays,
             "peak_hour": peak_hour,
+            "tz_label": tz_label,
             "night_owl_pct": night_pct,
             "morning_pct": morning_pct,
             "two_am_rabbit_holes": two_am_count,
@@ -1436,6 +1550,7 @@ def render_portable_brain(summary: dict[str, Any]) -> str:
     projects = summary["unfinished_projects"]
     platforms = ", ".join(f"{p['name']} ({p['pct']}%)" for p in summary["platforms"]) or "None"
 
+    tz_label = summary["rhythm"].get("tz_label", "UTC")
     lines = [
         "# Portable AI Brain & Personal Context Pack",
         "",
@@ -1448,7 +1563,7 @@ def render_portable_brain(summary: dict[str, Any]) -> str:
         f"- **Archetype**: {arch['name']} — {arch['tagline']}",
         f"- **Platforms Analyzed**: {platforms}",
         f"- **Typical Thread Depth**: {ov['avg_turns_per_chat']} messages/chat (deepest thread: {ov['longest_chat_turns']} turns)",
-        f"- **Active Peak Window**: Hour `{summary['rhythm']['peak_hour']:02d}:00 UTC` "
+        f"- **Active Peak Window**: Hour `{summary['rhythm']['peak_hour']:02d}:00 {tz_label}` "
         f"(night-owl share: {summary['rhythm']['night_owl_pct']}%)",
         "",
         "## 2. How I Like Responses Formatted",
@@ -1576,7 +1691,13 @@ def render_html(summary: dict[str, Any]) -> str:
         f"• AI clichés survived: {tone['sycophancy_total']}\n"
         f"Generated 100% offline with codesphere-u/ai-wrapped"
     )
-    safe_json_share = json.dumps(share_text).replace("<", "\\u003c")
+    safe_json_share = (
+        json.dumps(share_text)
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("&", "\\u0026")
+    )
+    tz_label = e(str(rhythm.get("tz_label", "UTC")))
 
     hours_svg = _build_hours_svg(rhythm["hours"])
     monthly_svg = _build_monthly_svg(summary["monthly_counts"])
@@ -1666,7 +1787,8 @@ def render_html(summary: dict[str, Any]) -> str:
   button.primary {{ background: linear-gradient(135deg, var(--cyan), #818cf8); color: #060913; border: none; }}
   button.active-mode {{ border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }}
   main {{ max-width: 1120px; margin: 0 auto; padding: 26px 20px 64px; }}
-  .story-nav {{ display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }}
+  .story-nav {{ display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }}
+  .nav-center {{ display: flex; align-items: center; gap: 10px; }}
   .dots {{ display: flex; gap: 6px; }}
   .dot {{ width: 9px; height: 9px; border-radius: 999px; background: rgba(148,163,184,0.28); cursor: pointer; border: none; padding: 0; }}
   .dot.on {{ width: 26px; background: linear-gradient(90deg, var(--cyan), var(--violet)); }}
@@ -1674,7 +1796,6 @@ def render_html(summary: dict[str, Any]) -> str:
   .deck.story-mode .card.active {{ display: flex; flex-direction: column; justify-content: space-between; animation: pop 0.25s ease-out; }}
   .deck.bento-mode {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 18px; }}
   .deck.bento-mode .span-2 {{ grid-column: 1 / -1; }}
-  .deck.bento-mode ~ .story-nav {{ display: none; }}
   @keyframes pop {{ from {{ opacity: 0; transform: translateY(8px); }} to {{ opacity: 1; transform: translateY(0); }} }}
   .card {{
     background: linear-gradient(160deg, rgba(16, 23, 39, 0.96), rgba(11, 16, 29, 0.98));
@@ -1709,12 +1830,12 @@ def render_html(summary: dict[str, Any]) -> str:
   .chart-svg {{ width: 100%; height: auto; display: block; margin-top: 10px; }}
   .split {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; align-items: center; margin-top: 10px; }}
   .gauge-wrap {{ display: flex; align-items: center; gap: 18px; }}
-  .stat-line {{ display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }}
+  .stat-line {{ display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 14px; overflow-wrap: anywhere; }}
   .loops-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 14px; }}
-  .loop-card {{ background: rgba(15, 23, 42, 0.72); border: 1px solid var(--border); border-radius: 14px; padding: 14px; }}
+  .loop-card {{ background: rgba(15, 23, 42, 0.72); border: 1px solid var(--border); border-radius: 14px; padding: 14px; min-width: 0; }}
   .loop-meta {{ display: flex; justify-content: space-between; font-size: 11px; color: var(--cyan); font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }}
-  .loop-title {{ font-weight: 700; font-size: 14px; margin-bottom: 6px; }}
-  .loop-last {{ font-size: 12px; color: var(--muted); }}
+  .loop-title {{ font-weight: 700; font-size: 14px; margin-bottom: 6px; overflow-wrap: anywhere; }}
+  .loop-last {{ font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }}
   .mono {{ font-variant-numeric: tabular-nums; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }}
   .footer-note {{ text-align: center; color: var(--muted); font-size: 12px; margin-top: 26px; }}
   @media print {{
@@ -1742,7 +1863,10 @@ def render_html(summary: dict[str, Any]) -> str:
 <main>
   <div id="story-nav" class="story-nav">
     <button onclick="step(-1)">← Previous</button>
-    <div id="dots" class="dots"></div>
+    <div class="nav-center">
+      <div id="dots" class="dots"></div>
+      <span id="slide-pos" class="mono muted" style="font-size:12px;">1 / 7</span>
+    </div>
     <button onclick="step(1)">Next →</button>
   </div>
 
@@ -1778,7 +1902,7 @@ def render_html(summary: dict[str, Any]) -> str:
     <section class="card" data-slide="2">
       <div>
         <div class="eyebrow">03 / CLOCK RHYTHM</div>
-        <h2>Peak flow hits at {_format_hour_12(rhythm['peak_hour'])} UTC</h2>
+        <h2>Peak flow hits at {_format_hour_12(rhythm['peak_hour'])} {tz_label}</h2>
         <p class="muted">Purple bars mark 10 PM–4 AM night-owl sessions ({rhythm['night_owl_pct']}% of all prompts, including {rhythm['two_am_rabbit_holes']} between 2 AM and 5 AM).</p>
         {hours_svg}
       </div>
@@ -1867,6 +1991,8 @@ def render_html(summary: dict[str, Any]) -> str:
     cur = (idx + slides.length) % slides.length;
     slides.forEach((s, i) => s.classList.toggle('active', i === cur));
     Array.from(dotsEl.children).forEach((d, i) => d.classList.toggle('on', i === cur));
+    const pos = document.getElementById('slide-pos');
+    if (pos) pos.textContent = (cur + 1) + ' / ' + slides.length;
   }}
 
   function step(delta) {{ go(cur + delta); }}
@@ -1883,13 +2009,32 @@ def render_html(summary: dict[str, Any]) -> str:
 
   async function copyShare() {{
     const btn = document.getElementById('btn-copy');
-    try {{
-      await navigator.clipboard.writeText(SHARE_TEXT);
+    const markCopied = () => {{
       btn.textContent = 'Copied!';
       setTimeout(() => btn.textContent = 'Copy Share Post', 1800);
-    }} catch {{
-      window.prompt('Copy your AI Wrapped post:', SHARE_TEXT);
-    }}
+    }};
+    try {{
+      if (navigator.clipboard && window.isSecureContext) {{
+        await navigator.clipboard.writeText(SHARE_TEXT);
+        markCopied();
+        return;
+      }}
+    }} catch {{}}
+    try {{
+      const ta = document.createElement('textarea');
+      ta.value = SHARE_TEXT;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (ok) {{
+        markCopied();
+        return;
+      }}
+    }} catch {{}}
+    window.prompt('Copy your AI Wrapped post:', SHARE_TEXT);
   }}
 
   document.addEventListener('keydown', (e) => {{
@@ -1911,11 +2056,12 @@ def format_terminal_report(summary: dict[str, Any], html_path: Path, brain_path:
     rhythm = summary["rhythm"]
     platforms = ", ".join(f"{p['name']} ({p['conversations']})" for p in summary["platforms"]) or "None"
     top_doms = ", ".join(d["name"] for d in summary["domains"][:3]) or "General"
+    tz_label = rhythm.get("tz_label", "UTC")
     lines = [
         f"AI Wrapped v{summary['version']} — Offline History & Portable Brain Report",
         f"Archetype: {arch['name']} — {arch['tagline']}",
         f"Stats:     {ov['conversations']:,} chats | {ov['user_turns']:,} prompts | {ov['user_words']:,} words ({ov['novel_comparison']})",
-        f"Rhythm:    Peak {_format_hour_12(rhythm['peak_hour'])} UTC | Streak: {ov['longest_streak_days']}d | 2-5 AM rabbit holes: {rhythm['two_am_rabbit_holes']}",
+        f"Rhythm:    Peak {_format_hour_12(rhythm['peak_hour'])} {tz_label} | Streak: {ov['longest_streak_days']}d | 2-5 AM rabbit holes: {rhythm['two_am_rabbit_holes']}",
         f"Platforms: {platforms}",
         f"Themes:    {top_doms}",
         f"Tone:      Politeness {tone['politeness_score']}/100 ({tone['politeness_verdict']}) | AI cliches survived: {tone['sycophancy_total']}",
@@ -1932,17 +2078,54 @@ def _is_unsafe_broad_root(target: Path) -> bool:
     return resolved == resolved.parent or resolved == Path.home().resolve()
 
 
+def _safe_mtime(path: Path) -> float:
+    try:
+        return path.stat().st_mtime
+    except OSError:
+        return -1.0
+
+
 def _auto_discover_exports() -> Path | None:
     downloads = Path.home() / "Downloads"
     if not downloads.is_dir():
         return None
-    patterns = ("*chatgpt*export*.zip", "*claude*export*.zip", "*takeout*.zip", "*conversations*.json")
-    matches: list[Path] = []
-    for pat in patterns:
-        matches.extend(downloads.glob(pat))
-    if not matches:
+    candidates: list[Path] = []
+    seen_paths: set[Path] = set()
+    named_patterns = (
+        "*chatgpt*.zip",
+        "*claude*.zip",
+        "*takeout*.zip",
+        "*gemini*.zip",
+        "*data-20*.zip",
+        "*conversations*.json",
+        "*MyActivity.json",
+        "*My Activity.html",
+    )
+    for pat in named_patterns:
+        for p in downloads.glob(pat):
+            if not p.is_symlink() and p.is_file() and p not in seen_paths:
+                seen_paths.add(p)
+                candidates.append(p)
+    # Catch OpenAI/Claude random UUID export ZIPs (e.g. f8c9a1...zip) and extracted export folders
+    for entry in downloads.iterdir():
+        if entry in seen_paths or entry.is_symlink():
+            continue
+        is_export_zip = entry.is_file() and entry.suffix.lower() == ".zip" and _zip_looks_like_export(entry)
+        is_export_dir = (
+            entry.is_dir()
+            and not entry.name.startswith(".")
+            and any(
+                (entry / marker).is_file()
+                for marker in ("conversations.json", "conversations-000.json", "MyActivity.json", "My Activity.html")
+            )
+        )
+        if is_export_zip or is_export_dir:
+            seen_paths.add(entry)
+            candidates.append(entry)
+    if not candidates:
         return None
-    return max(matches, key=lambda p: p.stat().st_mtime)
+    valid = [c for c in candidates if _safe_mtime(c) >= 0]
+    return max(valid, key=_safe_mtime) if valid else None
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1960,11 +2143,29 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--auto", action="store_true", help="Auto-detect the newest AI export ZIP/JSON in ~/Downloads")
     p.add_argument("--include-agents", action="store_true", help="Also include local ~/.claude/projects and ~/.codex/sessions")
     p.add_argument("--year", type=int, default=None, help="Filter metrics to a specific calendar year (e.g. 2026)")
+    p.add_argument(
+        "--tz",
+        choices=("utc", "local"),
+        default="utc",
+        help="Timezone for hourly clock and dates: 'utc' (default) or 'local'",
+    )
     p.add_argument("--output-dir", type=Path, default=Path("ai-wrapped-out"), help="Output directory (default: ./ai-wrapped-out)")
     p.add_argument("--json", action="store_true", help="Print full JSON summary to stdout")
     p.add_argument("--allow-home", action="store_true", help="Allow scanning the home directory or filesystem root")
     p.add_argument("--version", action="version", version=f"%(prog)s {VERSION}")
     return p
+
+
+def _load_only_agent_sessions() -> tuple[list[Conversation], list[str]]:
+    convs: list[Conversation] = []
+    sources: list[str] = []
+    for agent_dir in _iter_local_agent_dirs():
+        c_part, s_part = load_conversations_from_target(agent_dir, include_agents=False)
+        convs.extend(c_part)
+        for s in s_part:
+            if s not in sources:
+                sources.append(s)
+    return convs, sources
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1992,7 +2193,7 @@ def main(argv: list[str] | None = None) -> int:
         if discovered is not None:
             convs, sources = load_conversations_from_target(discovered, include_agents=args.include_agents)
         elif args.include_agents:
-            convs, sources = load_conversations_from_target(Path.home() / ".claude", include_agents=True)
+            convs, sources = _load_only_agent_sessions()
         else:
             print(
                 "ai-wrapped: no ChatGPT/Claude/Gemini export found in ~/Downloads "
@@ -2001,12 +2202,7 @@ def main(argv: list[str] | None = None) -> int:
             )
             return 2
     elif args.include_agents:
-        home = Path.home()
-        for agent_dir in (home / ".claude" / "projects", home / ".codex" / "sessions"):
-            if agent_dir.is_dir():
-                c_part, s_part = load_conversations_from_target(agent_dir, include_agents=False)
-                convs.extend(c_part)
-                sources.extend(s_part)
+        convs, sources = _load_only_agent_sessions()
     else:
         print(
             "ai-wrapped: pass an export path (e.g. `ai-wrapped ~/Downloads/export.zip`), "
@@ -2023,7 +2219,8 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 1
 
-    summary = analyze_conversations(convs, sources, year=args.year)
+    tz_mode: Literal["utc", "local"] = "local" if args.tz == "local" else "utc"
+    summary = analyze_conversations(convs, sources, year=args.year, tz_mode=tz_mode)
     if summary.get("empty"):
         print(f"ai-wrapped: no conversations matched `--year {args.year}`.", file=sys.stderr)
         return 1

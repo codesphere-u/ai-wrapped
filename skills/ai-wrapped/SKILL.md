@@ -10,7 +10,7 @@ license: MIT
 compatibility: Requires Python 3.10+ (stdlib only, zero external packages). Works completely offline.
 metadata:
   author: codesphere-u
-  version: "1.0.0"
+  version: "1.0.1"
   repository: https://github.com/codesphere-u/ai-wrapped
 ---
 
@@ -55,10 +55,10 @@ Generate an instant preview with the built-in multi-platform sample:
 python3 ~/.agents/skills/ai-wrapped/scripts/ai_wrapped.py --demo --output-dir ai-wrapped-out
 ```
 
-Filter to a single year and print JSON metrics to stdout:
+Filter to a single year, convert clock hours to local timezone, and print JSON metrics to stdout:
 
 ```bash
-python3 ~/.agents/skills/ai-wrapped/scripts/ai_wrapped.py path/to/export.zip --year 2026 --json
+python3 ~/.agents/skills/ai-wrapped/scripts/ai_wrapped.py path/to/export.zip --year 2026 --tz local --json
 ```
 
 > Load [references/privacy-and-formats.md](references/privacy-and-formats.md) for non-developer export instructions and exact PII/key redaction guarantees.

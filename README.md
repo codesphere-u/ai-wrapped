@@ -85,7 +85,7 @@ pip install git+https://github.com/codesphere-u/ai-wrapped@v1
 Once installed, run from anywhere:
 
 ```bash
-ai-wrapped ~/Downloads/chatgpt-export.zip --year 2026
+ai-wrapped ~/Downloads/chatgpt-export.zip --year 2026 --tz local
 ```
 
 Merge multiple exports (ChatGPT + Claude + Gemini Takeout) in one folder:
@@ -109,7 +109,7 @@ Full format & privacy breakdown: [`skills/ai-wrapped/references/privacy-and-form
 ## Development
 
 ```bash
-uv venv .venv && uv pip install --python .venv/bin/python -e ".[dev]" pip-audit
+uv venv --clear .venv && uv pip install --python .venv/bin/python -e ".[dev]" pip-audit
 .venv/bin/ruff check .
 .venv/bin/mypy
 .venv/bin/pytest -v

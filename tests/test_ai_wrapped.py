@@ -141,6 +141,86 @@ def test_multi_platform_zips_and_redaction(tmp_path: Path) -> None:
     assert "jane@example.com" not in rendered_html
     assert "<script>alert(1)</script>" not in rendered_html
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in rendered_html
+    top_words = {kw["word"] for kw in summary["top_keywords"]}
+    assert "supersecretkey123456" not in top_words
+    assert "example" not in top_words
+    assert "execCommand('copy')" in rendered_html
+
+
+def test_real_world_hardening_dedup_uuid_auto_and_non_utc_takeout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Non-UTC Takeout timestamps + Bard alias + ChatGPT sharded filename + UUID ZIP auto-discovery + dedup
+    downloads = tmp_path / "Downloads"
+    downloads.mkdir()
+    broken_link = downloads / "broken-chatgpt-export.zip"
+    broken_link.symlink_to(tmp_path / "does-not-exist.zip")
+
+    sharded_payload = [
+        {
+            "id": "dup-id-1",
+            "title": "Coffee Grinder Dial-In",
+            "create_time": 1767315600.0,
+            "current_node": "a1",
+            "mapping": {
+                "u1": {
+                    "id": "u1",
+                    "parent": None,
+                    "message": {
+                        "author": {"role": "user"},
+                        "create_time": 1767315600.0,
+                        "content": {"parts": ["Help dial in my espresso grinder for light roast beans."]},
+                    },
+                },
+                "t1": {
+                    "id": "t1",
+                    "parent": "u1",
+                    "message": {
+                        "author": {"role": "assistant"},
+                        "recipient": "web",
+                        "create_time": 1767315605.0,
+                        "content": {"content_type": "code", "text": '{"search_query": ["grinder", "ignored"]}'},
+                    },
+                },
+                "a1": {
+                    "id": "a1",
+                    "parent": "t1",
+                    "message": {
+                        "author": {"role": "assistant"},
+                        "create_time": 1767315610.0,
+                        "content": {"parts": ["Start two clicks finer than pour-over."]},
+                    },
+                },
+            },
+        }
+    ]
+
+    # Duplicate unzipped + UUID-named ZIP should deduplicate cleanly
+    uuid_zip = downloads / "a1b2c3d4-9999.zip"
+    with zipfile.ZipFile(uuid_zip, "w") as zf:
+        zf.writestr("conversations-0001-of-0002.json", json.dumps(sharded_payload))
+    (downloads / "conversations-0001-of-0002.json").write_text(json.dumps(sharded_payload), encoding="utf-8")
+
+    # Non-UTC Takeout PST & EU GMT+03:00 timestamps
+    assert ai_wrapped.parse_timestamp("Jan 5, 2025, 3:00:00 PM PST") is not None
+    assert ai_wrapped.parse_timestamp("Nov 14, 2026, 14:15:30 GMT+03:00") is not None
+
+    # Deduplication across dir containing both ZIP and unzipped JSON
+    convs, _ = ai_wrapped.load_conversations_from_target(downloads)
+    assert len(convs) == 1
+    # Tool-call JSON payload skipped from assistant prose turns
+    assert len(convs[0].turns) == 2
+
+    # `--auto` discovers UUID ZIP cleanly while ignoring broken symlink
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+    out_dir = tmp_path / "auto-out"
+    rc = ai_wrapped.main(["--auto", "--tz", "local", "--output-dir", str(out_dir)])
+    assert rc == 0
+    summary = json.loads((out_dir / "wrapped-summary.json").read_text(encoding="utf-8"))
+    assert summary["rhythm"]["tz_label"] == "Local"
+    assert summary["overview"]["conversations"] == 1
+    assert summary["version"] == ai_wrapped.VERSION
 
 
 def test_gemini_html_jsonl_markdown_and_year_filter(tmp_path: Path) -> None:
