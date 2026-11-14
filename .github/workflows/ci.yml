@@ -23,6 +23,7 @@ jobs:
 
       - name: Install dependencies & run checks
         run: |
+          rm -rf .venv
           uv venv .venv
           uv pip install --python .venv/bin/python -e ".[dev]" pip-audit
           .venv/bin/ruff check .
@@ -52,7 +53,8 @@ jobs:
 
       - name: Run pytest
         run: |
-          uv venv .venv
+          rm -rf .venv
+          uv venv --python ${{ matrix.python-version }} .venv
           uv pip install --python .venv/bin/python -e ".[dev]"
           .venv/bin/pytest -v
 
