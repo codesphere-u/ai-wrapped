@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Wrapped Rules — 8 Archetypes, Cliché Patterns &amp; Secret Shield</title>
+  <meta name="description" content="Search all 8 AI Wrapped archetypes, 8 AI cliché detectors, 7 style preference signals, and 11 secret/PII redaction patterns." />
+  <link rel="canonical" href="https://codesphere-u.github.io/ai-wrapped/rules.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AI Wrapped Archetypes &amp; Detection Rules" />
+  <meta property="og:description" content="Complete catalog of Archetypes, Cliché phrases, formatting signals, and privacy redaction rules inside AI Wrapped v1.1.0." />
+  <meta property="og:url" content="https://codesphere-u.github.io/ai-wrapped/rules.html" />
+  <meta property="og:image" content="https://codesphere-u.github.io/ai-wrapped/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "AI Wrapped Archetypes, Clichés & Privacy Rules Matrix",
+    "description": "Filterable reference of all 8 personality Archetypes, 8 AI sycophancy regex detectors, style signals, and 11 secret redaction rules.",
+    "url": "https://codesphere-u.github.io/ai-wrapped/rules.html",
+    "author": {
+      "@type": "Person",
+      "name": "Akandwanaho Ivan Alvin"
+    }
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="AI Wrapped Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="AI Wrapped">
+          <g stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="30" height="26" rx="7" fill="#fef9c3"/>
+            <rect x="6" y="10" width="22" height="12" rx="4" fill="#2563eb"/>
+            <circle cx="12" cy="16" r="2.6" fill="#fffdf2"/>
+            <circle cx="22" cy="16" r="2.6" fill="#eab308"/>
+          </g>
+          <text x="39" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.55">AI Wrapped</text>
+          <circle cx="164" cy="10" r="3" fill="#2563eb" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html">Studio</a>
+        <a href="proof.html">Proof</a>
+        <a href="rules.html" class="active">Rules</a>
+        <a href="docs.html">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/ai-wrapped" aria-label="AI Wrapped GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <h1>Archetypes, Clichés &amp; Privacy Matrix</h1>
+        <p class="hero-sub">Filter all 8 user Archetypes, 8 AI sycophancy detectors, 7 style preference cues, and core redaction rules inside <code>ai_wrapped.py</code>.</p>
+      </section>
+
+      <section aria-label="Rules Filter">
+        <div class="rules-filter">
+          <input class="input" id="rules-search" type="search" placeholder="Filter by keyword, e.g. Polymath, question, sk-, concise..." aria-label="Search archetypes and rules" />
+          <select class="select" id="rules-category" aria-label="Filter category">
+            <option value="all">All Patterns (22)</option>
+            <option value="archetype">User Archetypes (8)</option>
+            <option value="cliche">AI Cliché Detectors (8)</option>
+            <option value="shield">Secret Redaction Rules (6)</option>
+          </select>
+        </div>
+        <div class="toolbar-between" style="margin-bottom:0.75rem;">
+          <span class="eyebrow-label" id="rules-count" style="margin:0;">Showing 22 of 22 rules</span>
+          <button type="button" class="action-mini" id="rules-reset">Reset Filters</button>
+        </div>
+
+        <div class="doc-table-wrap">
+          <table class="doc-table">
+            <thead>
+              <tr>
+                <th>Rule / Name</th>
+                <th>Category</th>
+                <th>Trigger / Pattern</th>
+                <th>Summary</th>
+              </tr>
+            </thead>
+            <tbody id="rules-tbody">
+              <tr data-cat="archetype"><td><strong>The Midnight Polymath</strong></td><td><span class="pill pill-gold">Archetype</span></td><td><code>night_pct &gt;= 28%</code></td><td>Best ideas arrive after 10 PM—shipping side projects and 2 AM rabbit holes.</td></tr>
+              <tr data-cat="archetype"><td><strong>The Deep-Dive Systems Builder</strong></td><td><span class="pill pill-gold">Archetype</span></td><td><code>avg_turns &gt;= 10 &amp; Coding</code></td><td>Multi-turn debugging, schema iterations, and clarity alongside AI.</td></tr>
+              <tr data-cat="archetype"><td><strong>The Polite Perfectionist</strong></td><td><span class="pill pill-gold">Archetype</span></td><td><code>politeness_score &gt;= 78</code></td><td>Says please and thank you consistently across sessions.</td></tr>
+              <tr data-cat="archetype"><td><strong>The Multi-Model Strategist</strong></td><td><span class="pill pill-gold">Archetype</span></td><td><code>platform_count &gt;= 3</code></td><td>Routes each question across ChatGPT, Claude, and Gemini cleanly.</td></tr>
+              <tr data-cat="archetype"><td><strong>The Dawn Sprinter</strong></td><td><span class="pill pill-gold">Archetype</span></td><td><code>morning_pct &gt;= 40%</code></td><td>Clears tough writing, planning, and decisions early in the morning.</td></tr>
+              <tr data-cat="archetype"><td><strong>The Rapid-Fire Operator</strong></td><td><span class="pill pill-gold">Archetype</span></td><td><code>avg_turns &lt;= 4.5</code></td><td>Fast, targeted prompts in and crisp answers out.</td></tr>
+              <tr data-cat="archetype"><td><strong>The Editorial Wordsmith</strong></td><td><span class="pill pill-gold">Archetype</span></td><td><code>Writing / Creative domain</code></td><td>Iterates headlines, stories, and emails for voice precision.</td></tr>
+              <tr data-cat="archetype"><td><strong>The Everyday Explorer</strong></td><td><span class="pill pill-gold">Archetype</span></td><td><code>balanced fallback</code></td><td>Balances work, learning, trips, finances, and everyday planning.</td></tr>
+
+              <tr data-cat="cliche"><td><strong>Great question!</strong></td><td><span class="pill pill-cobalt">AI Cliché</span></td><td><code>great|excellent|wonderful question</code></td><td>Flags hollow opener compliments in assistant replies.</td></tr>
+              <tr data-cat="cliche"><td><strong>Certainly / Absolutely!</strong></td><td><span class="pill pill-cobalt">AI Cliché</span></td><td><code>^(certainly|absolutely|of course)</code></td><td>Counts formulaic affirmative preambles across threads.</td></tr>
+              <tr data-cat="cliche"><td><strong>I'd be happy to</strong></td><td><span class="pill pill-cobalt">AI Cliché</span></td><td><code>i(?:'d| would) be happy to</code></td><td>Tracks repetitive assistant politeness wrappers.</td></tr>
+              <tr data-cat="cliche"><td><strong>Let's break this down</strong></td><td><span class="pill pill-cobalt">AI Cliché</span></td><td><code>let's (break this down|dive in)</code></td><td>Detects boilerplate transition filler.</td></tr>
+              <tr data-cat="cliche"><td><strong>Filler Verb Stemmer</strong></td><td><span class="pill pill-cobalt">AI Cliché</span></td><td><code>\bdelv(?:e|es|ing)\b</code></td><td>Measures overused explorer verb filler in LLM prose.</td></tr>
+              <tr data-cat="cliche"><td><strong>Abstract Prose Filler</strong></td><td><span class="pill pill-cobalt">AI Cliché</span></td><td><code>multifaceted|testament|ever-evolving</code></td><td>Detects purple-prose abstraction clichés across replies.</td></tr>
+              <tr data-cat="cliche"><td><strong>It's important to note</strong></td><td><span class="pill pill-cobalt">AI Cliché</span></td><td><code>it is (?:important|worth) noting</code></td><td>Catches canned hedging clauses.</td></tr>
+              <tr data-cat="cliche"><td><strong>Comprehensive guide/overview</strong></td><td><span class="pill pill-cobalt">AI Cliché</span></td><td><code>comprehensive guide|overview</code></td><td>Surfaces generic framing titles in AI output.</td></tr>
+
+              <tr data-cat="shield"><td><strong>Provider API Keys</strong></td><td><span class="pill pill-good">Privacy Mask</span></td><td><code>sk-... / pplx-... / AIza...</code></td><td>Masked to <code>[redacted-api-key]</code> before tokenization.</td></tr>
+              <tr data-cat="shield"><td><strong>Forge &amp; Registry Tokens</strong></td><td><span class="pill pill-good">Privacy Mask</span></td><td><code>ghp_ / hf_ / gsk_ / npm_</code></td><td>Masked to <code>[redacted-token]</code> in HTML, JSON, and Markdown.</td></tr>
+              <tr data-cat="shield"><td><strong>Cloud &amp; Chat Tokens</strong></td><td><span class="pill pill-good">Privacy Mask</span></td><td><code>AKIA... / xoxb-...</code></td><td>Replaces AWS and Slack tokens safely before output generation.</td></tr>
+              <tr data-cat="shield"><td><strong>JWT &amp; Bearer Headers</strong></td><td><span class="pill pill-good">Privacy Mask</span></td><td><code>eyJ... / Bearer ...</code></td><td>Strips session tokens from snippets and keyword extraction.</td></tr>
+              <tr data-cat="shield"><td><strong>Emails &amp; Identities</strong></td><td><span class="pill pill-good">Privacy Mask</span></td><td><code>RFC-like email regex</code></td><td>Replaced with <code>[redacted-email]</code> for safe screenshots.</td></tr>
+              <tr data-cat="shield"><td><strong>SSNs &amp; Payment Digits</strong></td><td><span class="pill pill-good">Privacy Mask</span></td><td><code>ddd-dd-dddd / 13-19 digits</code></td><td>Masked to <code>[redacted-ssn]</code> / <code>[redacted-number]</code>.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/ai-wrapped" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>AI Wrapped v1.1.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "AI Wrapped — Offline AI Wrapped & Portable Brain",
+  "short_name": "AI Wrapped",
+  "version": "1.1.0",
+  "description": "100% offline ChatGPT, Claude & Gemini Wrapped story generator and Portable Brain migrator with zero cloud uploads.",
+  "start_url": "/ai-wrapped/",
+  "display": "standalone",
+  "background_color": "#fffdf2",
+  "theme_color": "#eab308",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

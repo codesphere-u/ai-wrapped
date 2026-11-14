@@ -5,6 +5,12 @@ All notable changes to **AI Wrapped** are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-11-14
+
+### Added
+- **Editorial Website & Browser Wrapped Studio (`website/`)**: Warm Ivory, Saffron Gold (`#eab308`) & Mediterranean Cobalt (`#2563eb`) multi-page website (`index.html`, `studio.html`, `proof.html`, `rules.html`, `docs.html`) featuring a custom mascot & wordmark, live client-side Privacy Redactor & AI Cliché Counter, Archetype & Novel Length Calculator, and `BRAIN_PORTABLE.md` Generator.
+- **GEO / Search Discovery & Documentation**: Added `llms.txt`, `llms-full.txt`, `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, Schema.org `@graph` JSON-LD, `website/marketing/` playbooks, `docs/GETTING_STARTED.md`, `docs/EXPORT_AND_PRIVACY.md`, `.github/workflows/pages.yml`, and automated regression checks (`tests/test_website_and_docs.py`).
+
 ## [1.0.1] - 2026-11-14
 
 ### Fixed & Hardened

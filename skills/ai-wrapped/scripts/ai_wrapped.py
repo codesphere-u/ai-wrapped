@@ -26,7 +26,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Any, Literal
 
-VERSION = "1.0.1"
+VERSION = "1.1.0"
 
 MAX_ZIP_MEMBER_BYTES = 200 * 1024 * 1024
 MAX_TEXT_FILE_BYTES = 120 * 1024 * 1024

@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Wrapped Studio — Redactor, Archetype &amp; Portable Brain Preview</title>
+  <meta name="description" content="Test AI Wrapped secret redaction, politeness vs AI cliché scoring, 8 Archetypes, novel comparisons, and BRAIN_PORTABLE.md export locally." />
+  <link rel="canonical" href="https://codesphere-u.github.io/ai-wrapped/studio.html" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="AI Wrapped Interactive Studio" />
+  <meta property="og:description" content="Preview secret masking, cliché counting, Archetype rules, and BRAIN_PORTABLE.md generation directly in your browser." />
+  <meta property="og:url" content="https://codesphere-u.github.io/ai-wrapped/studio.html" />
+  <meta property="og:image" content="https://codesphere-u.github.io/ai-wrapped/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "AI Wrapped Studio",
+    "applicationCategory": "UtilitiesApplication",
+    "operatingSystem": "Web",
+    "url": "https://codesphere-u.github.io/ai-wrapped/studio.html",
+    "softwareVersion": "1.1.0",
+    "description": "Local-only browser workbench for testing AI Wrapped secret redaction, cliché detection, Archetype rules, and BRAIN_PORTABLE.md generation."
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="AI Wrapped Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="AI Wrapped">
+          <g stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="30" height="26" rx="7" fill="#fef9c3"/>
+            <rect x="6" y="10" width="22" height="12" rx="4" fill="#2563eb"/>
+            <circle cx="12" cy="16" r="2.6" fill="#fffdf2"/>
+            <circle cx="22" cy="16" r="2.6" fill="#eab308"/>
+          </g>
+          <text x="39" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.55">AI Wrapped</text>
+          <circle cx="164" cy="10" r="3" fill="#2563eb" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html" class="active">Studio</a>
+        <a href="proof.html">Proof</a>
+        <a href="rules.html">Rules</a>
+        <a href="docs.html">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/ai-wrapped" aria-label="AI Wrapped GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="page-hero">
+        <h1>AI Wrapped Studio</h1>
+        <p class="hero-sub">Test screenshot-safe secret redaction, count AI clichés vs politeness cues, calculate your Archetype &amp; novel ratio, and build a <code>BRAIN_PORTABLE.md</code> pack offline.</p>
+      </section>
+
+      <section class="studio-frame" aria-label="Interactive AI Wrapped Studio">
+        <div class="handy-tabs-bar">
+          <div class="handy-tabs" role="tablist">
+            <button type="button" class="handy-tab active" data-studio-tab="shield">Secret Shield &amp; Cliché Mirror</button>
+            <button type="button" class="handy-tab" data-studio-tab="archetype">Archetype &amp; Novel Scale</button>
+            <button type="button" class="handy-tab" data-studio-tab="brain">BRAIN_PORTABLE.md Builder</button>
+          </div>
+          <span class="version-tag">100% Client-Side</span>
+        </div>
+
+        <div class="studio-panel active" id="panel-shield">
+          <div class="field">
+            <label>Sample Chat Snippets</label>
+            <div class="preset-pills">
+              <button type="button" class="chip-btn active" data-shield-preset="secrets">Leaked Keys + PII Mix</button>
+              <button type="button" class="chip-btn" data-shield-preset="cliches">AI Clichés &amp; Sycophancy</button>
+              <button type="button" class="chip-btn" data-shield-preset="clean">Clean Kyoto Plan</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="shield-input">Paste Snippet to Sanitize &amp; Audit</label>
+            <textarea class="textarea" id="shield-input" rows="6"></textarea>
+          </div>
+          <div class="score-row">
+            <div class="score-cell"><span>Secrets Masked</span><strong id="sh-masked-count">3</strong></div>
+            <div class="score-cell"><span>Clichés Found</span><strong id="sh-cliche-count">2</strong></div>
+            <div class="score-cell"><span>Polite Cues</span><strong id="sh-polite-count">2</strong></div>
+            <div class="score-cell"><span>Urgency Cues</span><strong id="sh-urgent-count">0</strong></div>
+          </div>
+          <div class="field">
+            <label>Redacted Preview Safe for Screenshots &amp; Keywords</label>
+            <pre class="code-block" id="sh-redacted-out"></pre>
+          </div>
+        </div>
+
+        <div class="studio-panel" id="panel-archetype">
+          <div class="form-row-2">
+            <div class="field">
+              <label for="ar-night">Night-Owl % (10 PM–5 AM): <strong id="ar-night-val">45%</strong></label>
+              <input class="input" type="range" id="ar-night" min="0" max="80" value="45" />
+            </div>
+            <div class="field">
+              <label for="ar-politeness">Politeness Score: <strong id="ar-polite-val">80</strong>/100</label>
+              <input class="input" type="range" id="ar-politeness" min="10" max="100" value="80" />
+            </div>
+          </div>
+          <div class="form-row-2">
+            <div class="field">
+              <label for="ar-platforms">Platforms Combined</label>
+              <select class="select" id="ar-platforms">
+                <option value="3" selected>3 Platforms (ChatGPT + Claude + Gemini)</option>
+                <option value="2">2 Platforms</option>
+                <option value="1">1 Platform</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ar-words">User Words Written</label>
+              <input class="input" type="number" id="ar-words" min="500" max="1500000" step="1000" value="65800" />
+            </div>
+          </div>
+          <div class="score-row">
+            <div class="score-cell"><span>Archetype</span><strong id="ar-title">The Midnight Polymath</strong></div>
+            <div class="score-cell"><span>Novel Comparison</span><strong id="ar-novel">1.4x The Great Gatsby</strong></div>
+            <div class="score-cell"><span>Tone Label</span><strong id="ar-tone">AI Overlords Spare You</strong></div>
+            <div class="score-cell"><span>Top Domain</span><strong id="ar-domain">Coding &amp; Tech</strong></div>
+          </div>
+          <div class="diag-note" id="ar-tagline">Best ideas arrive after 10 PM—shipping side projects, deep questions, and 2 AM rabbit holes.</div>
+        </div>
+
+        <div class="studio-panel" id="panel-brain">
+          <div class="form-row-2">
+            <div class="field">
+              <label for="br-target">Target AI Workspace</label>
+              <select class="select" id="br-target">
+                <option value="Claude Projects / Custom Instructions">Claude Projects / Custom Instructions</option>
+                <option value="ChatGPT Memory">ChatGPT Memory</option>
+                <option value="Gemini Gems">Gemini Gems</option>
+                <option value="AGENTS.md / CLAUDE.md">AGENTS.md / CLAUDE.md</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="br-style">Formatting Preference</label>
+              <select class="select" id="br-style">
+                <option value="concise">Concise bullet points &amp; comparison tables</option>
+                <option value="steps">Clear step-by-step walkthroughs with examples</option>
+                <option value="critical">Direct critique, flag missing edge cases upfront</option>
+              </select>
+            </div>
+          </div>
+          <div class="toolbar-between" style="margin-bottom:0.45rem;">
+            <span class="eyebrow-label" style="margin:0;">Generated BRAIN_PORTABLE.md Preview</span>
+            <button type="button" class="action-mini" id="copy-brain-btn">Copy Markdown</button>
+          </div>
+          <pre class="code-block" id="br-output"></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/ai-wrapped" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>AI Wrapped v1.1.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

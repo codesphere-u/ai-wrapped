@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Wrapped Docs — Install, Export Formats, CLI Flags &amp; Privacy</title>
+  <meta name="description" content="Complete AI Wrapped v1.1.0 documentation for ChatGPT, Claude, and Gemini exports, offline CLI options, Agent Skill install, and privacy." />
+  <link rel="canonical" href="https://codesphere-u.github.io/ai-wrapped/docs.html" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="AI Wrapped Documentation" />
+  <meta property="og:description" content="Install options, 30-second export instructions, CLI flags, BRAIN_PORTABLE.md output, and offline privacy guarantees." />
+  <meta property="og:url" content="https://codesphere-u.github.io/ai-wrapped/docs.html" />
+  <meta property="og:image" content="https://codesphere-u.github.io/ai-wrapped/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "AI Wrapped v1.1.0 Documentation",
+    "description": "Instructions for installing AI Wrapped via uvx, pip, or skills.sh, exporting AI chat archives, and tuning CLI filters.",
+    "url": "https://codesphere-u.github.io/ai-wrapped/docs.html",
+    "author": {
+      "@type": "Person",
+      "name": "Akandwanaho Ivan Alvin"
+    }
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col page-col-docs">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="AI Wrapped Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="AI Wrapped">
+          <g stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="30" height="26" rx="7" fill="#fef9c3"/>
+            <rect x="6" y="10" width="22" height="12" rx="4" fill="#2563eb"/>
+            <circle cx="12" cy="16" r="2.6" fill="#fffdf2"/>
+            <circle cx="22" cy="16" r="2.6" fill="#eab308"/>
+          </g>
+          <text x="39" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.55">AI Wrapped</text>
+          <circle cx="164" cy="10" r="3" fill="#2563eb" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html">Studio</a>
+        <a href="proof.html">Proof</a>
+        <a href="rules.html">Rules</a>
+        <a href="docs.html" class="active">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/ai-wrapped" aria-label="AI Wrapped GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <div class="docs-mobile-nav" role="tablist" aria-label="Documentation Sections">
+        <button type="button" class="docs-mobile-chip active" data-doc-target="install">Install &amp; Demo</button>
+        <button type="button" class="docs-mobile-chip" data-doc-target="exports">Export Data</button>
+        <button type="button" class="docs-mobile-chip" data-doc-target="cli-flags">CLI Flags</button>
+        <button type="button" class="docs-mobile-chip" data-doc-target="portable-brain">Portable Brain</button>
+        <button type="button" class="docs-mobile-chip" data-doc-target="privacy">Privacy Shield</button>
+      </div>
+
+      <div class="docs-layout">
+        <aside class="docs-sidebar" aria-label="Documentation Navigation">
+          <ul class="docs-rail">
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link active" data-doc-target="install">Install &amp; Demo</button>
+              <ul class="doc-subrail open" data-subrail-for="install">
+                <li><a class="doc-sub-link active" href="#sec-install-methods">Zero-Install &amp; CLI</a></li>
+                <li><a class="doc-sub-link" href="#sec-agent-skill">Agent Skill &amp; Plugin</a></li>
+              </ul>
+            </li>
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link" data-doc-target="exports">Export Your Data</button>
+              <ul class="doc-subrail" data-subrail-for="exports">
+                <li><a class="doc-sub-link" href="#sec-chatgpt-claude">ChatGPT &amp; Claude</a></li>
+                <li><a class="doc-sub-link" href="#sec-gemini-merge">Gemini &amp; Merge</a></li>
+              </ul>
+            </li>
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link" data-doc-target="cli-flags">CLI Flags</button>
+              <ul class="doc-subrail" data-subrail-for="cli-flags">
+                <li><a class="doc-sub-link" href="#sec-flag-table">All Options</a></li>
+              </ul>
+            </li>
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link" data-doc-target="portable-brain">Portable Brain</button>
+              <ul class="doc-subrail" data-subrail-for="portable-brain">
+                <li><a class="doc-sub-link" href="#sec-brain-sections">6 Brief Sections</a></li>
+              </ul>
+            </li>
+            <li class="doc-nav-item">
+              <button type="button" class="doc-nav-link" data-doc-target="privacy">Privacy Shield</button>
+              <ul class="doc-subrail" data-subrail-for="privacy">
+                <li><a class="doc-sub-link" href="#sec-safety-bounds">Redaction &amp; Limits</a></li>
+              </ul>
+            </li>
+          </ul>
+        </aside>
+
+        <article class="doc-content">
+          <section data-doc-panel="install">
+            <h1>Install &amp; Instant Demo</h1>
+            <p>AI Wrapped uses Python 3.10+ standard library modules exclusively—no third-party packages are downloaded at runtime and zero network calls ever execute.</p>
+
+            <h2 id="sec-install-methods">Zero-Install &amp; CLI Options</h2>
+            <div class="handy-card">
+              <div class="handy-tabs-bar">
+                <div class="handy-tabs" role="tablist">
+                  <button type="button" class="handy-tab active" data-install-tab="uvx">uvx Demo</button>
+                  <button type="button" class="handy-tab" data-install-tab="skill">Agent Skill</button>
+                  <button type="button" class="handy-tab" data-install-tab="pip">Pip Tool</button>
+                </div>
+                <span class="version-tag">v1.1.0</span>
+              </div>
+              <div class="doc-codeblock" style="margin:0;">
+                <pre id="docs-install-pre">uvx --from git+https://github.com/codesphere-u/ai-wrapped ai-wrapped --demo</pre>
+                <button type="button" class="copy-icon-btn" data-copy-target="docs-install-pre" aria-label="Copy command">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <h2 id="sec-agent-skill">Claude Code Plugin &amp; Agent Skill</h2>
+            <p>Install via <code>npx skills add codesphere-u/ai-wrapped</code> or register inside Claude Code with <code>/plugin install ai-wrapped --marketplace codesphere-u/ai-wrapped</code>. Then run <code>--auto</code> to inspect your newest download locally.</p>
+          </section>
+
+          <section data-doc-panel="exports" hidden>
+            <h1>Export Your Data (30 Seconds)</h1>
+            <p>Request official export archives directly from each provider and point <code>ai-wrapped</code> at either a single ZIP or a folder holding all three platforms.</p>
+
+            <h2 id="sec-chatgpt-claude">ChatGPT &amp; Claude</h2>
+            <ul>
+              <li><strong>ChatGPT</strong>: Open <strong>Settings -> Data controls -> Export data</strong> and download the ZIP (reads single <code>conversations.json</code> or sharded <code>conversations-000.json</code> cleanly).</li>
+              <li><strong>Claude</strong>: Open <strong>Settings -> Privacy -> Export Data</strong> and download your archive containing <code>chat_messages</code>.</li>
+            </ul>
+
+            <h2 id="sec-gemini-merge">Google Gemini &amp; Merging Multiple Archives</h2>
+            <p>On <strong>takeout.google.com</strong>, deselect all services and pick <strong>My Activity -> Gemini Apps</strong> (JSON or HTML). Place every archive in one directory and run <code>ai-wrapped ~/Documents/my-ai-exports --tz local</code>.</p>
+          </section>
+
+          <section data-doc-panel="cli-flags" hidden>
+            <h1>CLI Flags Reference</h1>
+            <p>Tune year boundaries, local timezone clock charts, coding agent JSONL inclusion, or stdout JSON mode.</p>
+
+            <h2 id="sec-flag-table">All Options</h2>
+            <div class="doc-table-wrap">
+              <table class="doc-table">
+                <thead><tr><th>Flag</th><th>Effect</th></tr></thead>
+                <tbody>
+                  <tr><td><code>--demo</code></td><td>Runs the bundled 20-conversation ChatGPT/Claude/Gemini showcase.</td></tr>
+                  <tr><td><code>--auto</code></td><td>Finds the newest export archive or extracted UUID export folder in <code>~/Downloads</code>.</td></tr>
+                  <tr><td><code>--include-agents</code></td><td>Adds local <code>~/.claude/projects</code> and <code>~/.codex/sessions</code> JSONL transcripts.</td></tr>
+                  <tr><td><code>--year YEAR</code></td><td>Filters conversations and metrics to one calendar year (e.g., <code>2026</code>).</td></tr>
+                  <tr><td><code>--tz {utc,local}</code></td><td>Switches 24-hour clock charts and peak hour metrics between UTC and local timezone.</td></tr>
+                  <tr><td><code>--output-dir DIR</code></td><td>Sets output folder for <code>ai-wrapped.html</code>, <code>BRAIN_PORTABLE.md</code>, and JSON (default <code>./ai-wrapped-out</code>).</td></tr>
+                  <tr><td><code>--json</code></td><td>Writes structured analytics summary JSON to stdout.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section data-doc-panel="portable-brain" hidden>
+            <h1>Portable Brain (`BRAIN_PORTABLE.md`)</h1>
+            <p>Switch across ChatGPT, Claude, Gemini, or Cursor in seconds by pasting one compact, secret-scrubbed Markdown brief.</p>
+
+            <h2 id="sec-brain-sections">Six Distilled Brief Sections</h2>
+            <ol>
+              <li>Identity &amp; Archetype Profile</li>
+              <li>Response Formatting Preferences (concise bullets, tables, concrete examples, direct critique)</li>
+              <li>Primary Focus Domains</li>
+              <li>Recurring Vocabulary (post-secret redaction)</li>
+              <li>Buried Unfinished Multi-Turn Projects</li>
+              <li>Standing Assistant Guardrails</li>
+            </ol>
+          </section>
+
+          <section data-doc-panel="privacy" hidden>
+            <h1>Privacy &amp; Safety Architecture</h1>
+            <p>Designed from line one so screenshots and portable briefs never leak secrets or scan unrelated home folders.</p>
+
+            <h2 id="sec-safety-bounds">Redaction &amp; Bounds</h2>
+            <ul>
+              <li><strong>In-memory ZIP extraction</strong>: Rejects zip-slip <code>..</code> entries and enforces <code>200 MB</code> per compressed entry.</li>
+              <li><strong>Pre-tokenization secret scrubbing</strong>: Replaces API keys, forge tokens, JWTs, Bearer headers, emails, SSNs, and card digits before keyword counting.</li>
+              <li><strong>Broad-root protection</strong>: Refuses scanning <code>~</code> or <code>/</code> unless <code>--allow-home</code> is passed.</li>
+            </ul>
+          </section>
+
+          <div class="doc-pagination">
+            <button type="button" class="page-step-btn prev" id="doc-prev-btn" hidden>
+              <small>Previous</small>
+              <strong id="doc-prev-label">—</strong>
+            </button>
+            <button type="button" class="page-step-btn next" id="doc-next-btn">
+              <small>Next</small>
+              <strong id="doc-next-label">Export Your Data</strong>
+            </button>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/ai-wrapped" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>AI Wrapped v1.1.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

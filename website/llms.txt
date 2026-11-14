@@ -1,0 +1,17 @@
+# AI Wrapped v1.1.0
+
+> 100% offline ChatGPT, Claude & Google Gemini Wrapped story generator and Portable Brain (`BRAIN_PORTABLE.md`) migrator. Pure Python 3.10+ stdlib with zero network calls and zero external runtime libraries.
+
+## Live Site & Key Pages
+- Home: https://codesphere-u.github.io/ai-wrapped/
+- Interactive Browser Studio (Privacy Shield, Cliché Counter & BRAIN_PORTABLE.md Preview): https://codesphere-u.github.io/ai-wrapped/studio.html
+- Observed Demo Proof & Privacy Benchmark: https://codesphere-u.github.io/ai-wrapped/proof.html
+- Archetypes, Cliché Patterns & Redaction Rules Matrix: https://codesphere-u.github.io/ai-wrapped/rules.html
+- Documentation (Install, Export Guides, CLI Flags, Privacy Guarantees): https://codesphere-u.github.io/ai-wrapped/docs.html
+- Source Code & Releases: https://github.com/codesphere-u/ai-wrapped
+
+## Core Capabilities
+- Universal Offline Parsers: ChatGPT ZIP (`conversations.json` + sharded `conversations-*.json` active `current_node` branch resolution), Claude `chat_messages`, Google Gemini Takeout (`MyActivity.json` / `My Activity.html`), opt-in `--include-agents` JSONL, and Markdown logs.
+- Interactive Story & Bento Dashboard (`ai-wrapped.html`): Zero-CDN HTML deck with novel-length comparisons (`The Great Gatsby`, `Dune`, `War and Peace`), circadian 24-hour clock, longest streak, politeness vs AI cliché mirror, buried project resurfacer, and 8 Archetypes.
+- Portable Brain (`BRAIN_PORTABLE.md`): Distills formatting rules, obsessions, unfinished multi-turn projects, and standing guardrails ready for Claude Projects, ChatGPT Memory, Gemini Gems, or `AGENTS.md`.
+- Privacy & Redaction: In-memory ZIP reads, `200 MB` member limit, broad-root guard against scanning `$HOME` or `/`, and 11 secret/PII redaction patterns (`sk-`, `ghp_`, `AIza`, `AKIA`, JWTs, Bearer headers, emails, SSNs, cards) applied before tokenization.

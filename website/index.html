@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Wrapped — Offline ChatGPT, Claude &amp; Gemini Story + Portable Brain</title>
+  <meta name="description" content="Convert ChatGPT, Claude, and Gemini exports into an offline 7-card HTML story and BRAIN_PORTABLE.md with zero cloud uploads." />
+  <link rel="canonical" href="https://codesphere-u.github.io/ai-wrapped/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="AI Wrapped" />
+  <meta property="og:title" content="AI Wrapped — Offline ChatGPT, Claude &amp; Gemini Wrapped" />
+  <meta property="og:description" content="Zero-upload AI history Wrapped HTML story, cliché mirror, secret redactor, and BRAIN_PORTABLE.md memory migrator." />
+  <meta property="og:url" content="https://codesphere-u.github.io/ai-wrapped/" />
+  <meta property="og:image" content="https://codesphere-u.github.io/ai-wrapped/og-image.svg" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AI Wrapped v1.1.0 — Your AI Year, 100% Offline" />
+  <meta name="twitter:description" content="Turn exported ChatGPT, Claude & Gemini archives into a shareable HTML story and Portable Brain locally." />
+  <meta name="twitter:image" content="https://codesphere-u.github.io/ai-wrapped/og-image.svg" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="alternate" type="text/plain" href="llms.txt" title="LLMs Summary" />
+  <link rel="stylesheet" href="styles.css" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "name": "Codesphere Innovations",
+        "url": "https://github.com/codesphere-u"
+      },
+      {
+        "@type": "Person",
+        "name": "Akandwanaho Ivan Alvin",
+        "url": "https://github.com/codesphere-u"
+      },
+      {
+        "@type": "WebSite",
+        "name": "AI Wrapped",
+        "url": "https://codesphere-u.github.io/ai-wrapped/"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "name": "AI Wrapped",
+        "softwareVersion": "1.1.0",
+        "applicationCategory": "UtilitiesApplication",
+        "operatingSystem": "macOS, Linux, Windows",
+        "url": "https://codesphere-u.github.io/ai-wrapped/",
+        "downloadUrl": "https://github.com/codesphere-u/ai-wrapped/releases/tag/v1.1.0",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Zero-dependency Python 3.10+ analyzer turning ChatGPT, Claude, and Gemini exports into an interactive HTML Wrapped story and BRAIN_PORTABLE.md offline."
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Do any of my private chats leave my laptop?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Never. AI Wrapped runs exclusively with Python 3.10+ standard library modules on local files, streams ZIP archives in memory, makes zero network calls, and masks API keys, emails, SSNs, and JWTs before rendering outputs."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which export formats does AI Wrapped read?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "It parses ChatGPT conversations.json and sharded conversations-*.json ZIPs via active current_node branches, Claude chat_messages exports, Google Gemini Takeout MyActivity.json and My Activity.html files, opt-in local agent JSONL sessions, and Markdown logs."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What goes into BRAIN_PORTABLE.md?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "It distills your AI Archetype, response formatting preferences, recurring topic areas, unfinished multi-turn projects, and anti-filler instructions ready to paste into Claude Projects, ChatGPT Memory, Gemini Gems, or AGENTS.md."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+</head>
+<body data-analytics="plausible">
+  <div class="page-col">
+    <header class="site-header">
+      <a class="brand-link" href="index.html" aria-label="AI Wrapped Home">
+        <svg class="brand-wordmark-svg" viewBox="0 0 196 36" width="196" height="36" role="img" aria-label="AI Wrapped">
+          <g stroke="#1e1b18" stroke-width="2" stroke-linejoin="round">
+            <rect x="2" y="5" width="30" height="26" rx="7" fill="#fef9c3"/>
+            <rect x="6" y="10" width="22" height="12" rx="4" fill="#2563eb"/>
+            <circle cx="12" cy="16" r="2.6" fill="#fffdf2"/>
+            <circle cx="22" cy="16" r="2.6" fill="#eab308"/>
+          </g>
+          <text x="39" y="25" font-family="-apple-system,Segoe UI,sans-serif" font-size="22" font-weight="800" fill="#1e1b18" stroke="#1e1b18" stroke-width="0.55">AI Wrapped</text>
+          <circle cx="164" cy="10" r="3" fill="#2563eb" stroke="#1e1b18" stroke-width="1.2"/>
+        </svg>
+      </a>
+      <nav class="header-nav" aria-label="Primary Navigation">
+        <a href="studio.html">Studio</a>
+        <a href="proof.html">Proof</a>
+        <a href="rules.html">Rules</a>
+        <a href="docs.html">Docs</a>
+        <a class="icon-link" href="https://github.com/codesphere-u/ai-wrapped" aria-label="AI Wrapped GitHub Repository" target="_blank" rel="noopener">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.1c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.9 1.3 1.9 1.3 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
+        </a>
+        <a class="nav-pill" href="docs.html">Install</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero-duo">
+        <div class="mascot-wrap" aria-hidden="true">
+          <svg viewBox="0 0 140 140" width="140" height="140">
+            <rect x="12" y="24" width="116" height="92" rx="24" fill="#fef9c3" stroke="#1e1b18" stroke-width="4.5"/>
+            <rect x="26" y="40" width="88" height="44" rx="14" fill="#2563eb" stroke="#1e1b18" stroke-width="4"/>
+            <circle cx="50" cy="62" r="12" fill="#fffdf2" stroke="#1e1b18" stroke-width="3.5"/>
+            <circle cx="90" cy="62" r="12" fill="#eab308" stroke="#1e1b18" stroke-width="3.5"/>
+            <path d="M50 62h40" stroke="#dbeafe" stroke-width="3" stroke-dasharray="5 5" stroke-linecap="round"/>
+            <rect x="40" y="96" width="60" height="10" rx="5" fill="#1e1b18"/>
+            <circle cx="32" cy="18" r="5" fill="#eab308" stroke="#1e1b18" stroke-width="3"/>
+            <circle cx="108" cy="18" r="5" fill="#2563eb" stroke="#1e1b18" stroke-width="3"/>
+          </svg>
+        </div>
+        <div class="hero-copy">
+          <h1>Your AI year, wrapped offline.</h1>
+          <p class="hero-sub">Turn ChatGPT, Claude &amp; Gemini exports into a 7-card HTML story and a portable <code>BRAIN_PORTABLE.md</code> brief—with zero cloud uploads.</p>
+        </div>
+      </section>
+
+      <section class="cta-area" aria-label="Try AI Wrapped">
+        <div class="split-btn-group">
+          <button type="button" class="split-main" id="cta-copy-btn">
+            <strong>Copy Instant Demo Command</strong>
+            <span>v1.1.0 · Zero Dependencies · Python 3.10+ Stdlib</span>
+          </button>
+          <button type="button" class="split-caret" id="cta-popover-toggle" aria-expanded="false" aria-controls="cta-popover" aria-label="Switch command preset">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+        </div>
+        <div class="cmd-caption" id="cta-caption-text">uvx --from git+https://github.com/codesphere-u/ai-wrapped ai-wrapped --demo</div>
+
+        <div class="cta-popover" id="cta-popover">
+          <div class="pop-tabs" role="tablist" aria-label="Command presets">
+            <button type="button" class="pop-tab active" data-cmd="uvx --from git+https://github.com/codesphere-u/ai-wrapped ai-wrapped --demo">uvx Demo</button>
+            <button type="button" class="pop-tab" data-cmd="npx skills add codesphere-u/ai-wrapped">Agent Skill</button>
+            <button type="button" class="pop-tab" data-cmd="ai-wrapped --auto --tz local">Auto Downloads</button>
+            <button type="button" class="pop-tab" data-cmd="pip install git+https://github.com/codesphere-u/ai-wrapped">Pip Install</button>
+          </div>
+          <div class="pop-cmd">
+            <code id="cta-pop-code">uvx --from git+https://github.com/codesphere-u/ai-wrapped ai-wrapped --demo</code>
+            <button type="button" class="copy-icon-btn" id="cta-pop-copy" aria-label="Copy selected command">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section class="preview-frame" aria-label="Interactive AI Wrapped Output Preview">
+        <div class="frame-bar">
+          <div class="dots" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="frame-tabs" role="tablist">
+            <button type="button" class="frame-tab active" data-home-tab="story">1. Wrapped Archetype</button>
+            <button type="button" class="frame-tab" data-home-tab="brain">2. BRAIN_PORTABLE.md</button>
+            <button type="button" class="frame-tab" data-home-tab="privacy">3. Secret Shield</button>
+          </div>
+          <a class="frame-open-link" href="studio.html">Open Studio →</a>
+        </div>
+        <div class="preview-body" id="home-preview-body"></div>
+        <div class="preview-foot">
+          <span>Observed output from <strong>ai-wrapped --demo</strong> (v1.1.0)</span>
+          <span class="preview-foot-links">
+            <a href="proof.html">Read Demo Proof</a>
+            <a href="rules.html">8 Archetypes &amp; Patterns</a>
+          </span>
+        </div>
+      </section>
+
+      <hr class="hairline" />
+
+      <section class="editorial-grid" aria-label="Why AI Wrapped">
+        <article>
+          <h2>7-Card Story &amp; Bento</h2>
+          <p>Writes a single self-contained <code>ai-wrapped.html</code> with novel-length word ratios, 24-hour rabbit-hole clock, streak calendar, and zero external CDNs.</p>
+        </article>
+        <article>
+          <h2>Portable Memory Pack</h2>
+          <p>Distills your style rules, obsessions, and abandoned projects into <code>BRAIN_PORTABLE.md</code> to migrate cleanly across Claude, ChatGPT, and Gemini.</p>
+        </article>
+        <article>
+          <h2>Politeness vs. Clichés</h2>
+          <p>Measures your <code>please</code> / <code>thank you</code> politeness score alongside how many <em>“Great question!”</em> and <em>“Let's break this down”</em> tropes AI assistants fed back.</p>
+        </article>
+        <article>
+          <h2>Screenshot-Safe Shield</h2>
+          <p>Streams ZIPs strictly in memory, blocks zip-slip paths and broad <code>$HOME</code> scans, and redacts API keys, emails, JWTs, and SSNs prior to tokenization.</p>
+        </article>
+      </section>
+
+      <hr class="hairline" />
+
+      <section class="ecosystem-section">
+        <h2>Three local outputs. Zero network calls.</h2>
+        <p class="ecosystem-sub">Drop any ChatGPT ZIP, Claude export, or Google Takeout archive into one folder and walk away with clarity in two seconds.</p>
+        <div class="eco-badges">
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">GPT</div>
+            <span>ChatGPT ZIP</span>
+          </div>
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">CLD</div>
+            <span>Claude JSON</span>
+          </div>
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">GEM</div>
+            <span>Gemini Takeout</span>
+          </div>
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">HTML</div>
+            <span>Wrapped Deck</span>
+          </div>
+          <div class="eco-item">
+            <div class="eco-circle" aria-hidden="true">MD</div>
+            <span>Portable Brain</span>
+          </div>
+        </div>
+        <p class="inline-cta-links">Test secret redaction and Archetype logic in the <a href="studio.html">Interactive Studio</a> or read the <a href="docs.html">30-second export guide</a>.</p>
+      </section>
+
+      <hr class="hairline" />
+
+      <section aria-label="Frequently Asked Questions">
+        <h2 class="sec-title">Questions users ask first</h2>
+        <div class="faq-stack">
+          <details class="faq-item">
+            <summary>How does AI Wrapped avoid leaking secrets into top keywords?</summary>
+            <p>All 11 patterns in <code>SECRET_REDACT_PATTERNS</code> (covering OpenAI/Anthropic <code>sk-</code> keys, GitHub/HF/Groq tokens, Google <code>AIza</code> keys, AWS keys, JWTs, Bearer headers, emails, SSNs, and cards) are replaced <em>before</em> frequency counting or rendering HTML/Markdown.</p>
+          </details>
+          <details class="faq-item">
+            <summary>Does it work on newer sharded ChatGPT ZIP exports?</summary>
+            <p>Yes. It parses both classic <code>conversations.json</code> and multi-shard <code>conversations-000.json</code> exports, resolving active <code>current_node</code> branches while ignoring internal <code>recipient != all</code> tool payloads.</p>
+          </details>
+          <details class="faq-item">
+            <summary>How do I switch between UTC and my local wall clock?</summary>
+            <p>Pass <code>--tz local</code> to adjust the 24-hour circadian chart, 2–5 AM rabbit-hole metric, and peak activity hour to your machine timezone.</p>
+          </details>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-links">
+        <a href="index.html">Home</a> ·
+        <a href="studio.html">Studio</a> ·
+        <a href="proof.html">Proof</a> ·
+        <a href="rules.html">Rules</a> ·
+        <a href="docs.html">Docs</a> ·
+        <a href="llms.txt">llms.txt</a> ·
+        <a href="https://github.com/codesphere-u/ai-wrapped" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <div>AI Wrapped v1.1.0 · MIT License · Zero-cookie analytics ready for Plausible</div>
+    </footer>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="app.js"></script>
+</body>
+</html>

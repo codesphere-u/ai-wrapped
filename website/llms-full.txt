@@ -1,0 +1,26 @@
+# AI Wrapped v1.1.0 — Complete Offline Reference
+
+AI Wrapped converts years of exported ChatGPT, Claude, and Google Gemini history into two local files (`ai-wrapped.html` and `BRAIN_PORTABLE.md`) plus structured `wrapped-summary.json`, without uploading data to external servers or requiring API keys.
+
+## CLI Options & Quickstart
+- Instant demo: `ai-wrapped --demo` or `uvx --from git+https://github.com/codesphere-u/ai-wrapped ai-wrapped --demo`
+- Auto-detect newest export ZIP in `~/Downloads`: `ai-wrapped --auto`
+- Combine multiple exports in a folder: `ai-wrapped ~/Documents/my-ai-exports --year 2026 --tz local --output-dir my-wrapped`
+- Include local coding agent transcripts (`~/.claude/projects`, `~/.codex/sessions`): `ai-wrapped ~/Documents/exports --include-agents`
+- Install as Agent Skill: `npx skills add codesphere-u/ai-wrapped`
+- JSON output to stdout: `ai-wrapped --demo --json`
+
+## Supported Input Formats
+1. OpenAI ChatGPT exports: single `conversations.json` or sharded `conversations-000.json`, resolving active `current_node` branches and ignoring `recipient != all` internal tool JSON.
+2. Anthropic Claude exports: ZIP or JSON containing `chat_messages`.
+3. Google Gemini Takeout: `.zip`, `MyActivity.json`, or `My Activity.html` (including `Bard` aliases and non-UTC timezone suffixes such as `PST` or `GMT+03:00`).
+4. Local Coding Agents & Markdown (`--include-agents` or explicit folder): JSONL transcripts and `You:` / `Assistant:` Markdown logs.
+
+## Privacy & Safety Bounds
+- `MAX_ZIP_MEMBER_BYTES = 200 MB`, `MAX_TEXT_FILE_BYTES = 120 MB`, `MAX_JSONL_BYTES = 50 MB`, `MAX_CONVERSATIONS = 100,000`.
+- Rejects zip-slip path traversal (`..`), broad-root targets (`~`, `/`) unless `--allow-home` is passed, and deduplicates overlapping ZIP + extracted JSON archives.
+- Masks 11 credential & PII classes (`sk-...`, `ghp_` / `hf_` / `gsk_` / `github_pat_`, `pplx-...`, `AIza...`, `xox...`, `AKIA...`, JWT `eyJ...`, `Bearer ...`, emails, SSNs, credit cards) prior to keyword tokenization so keys never leak into `top_keywords` or `BRAIN_PORTABLE.md`.
+
+## Observed `--demo` Benchmark & Output
+- `20 chats | 35 prompts | 538 words`, Peak `11 PM UTC`, Longest streak `9d`, `6` 2-5 AM rabbit holes, Platforms: `ChatGPT (8), Claude (7), Gemini (5)`, Politeness `80/100`, Received AI clichés: `37`.
+- Archetype assigned: `The Midnight Polymath`.

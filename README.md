@@ -1,6 +1,9 @@
 # AI Wrapped — 100% Offline ChatGPT, Claude & Gemini Wrapped + Portable Brain
 
+> **Live Website & Browser Studio:** [https://codesphere-u.github.io/ai-wrapped/](https://codesphere-u.github.io/ai-wrapped/) · **Interactive Studio:** [Studio](https://codesphere-u.github.io/ai-wrapped/studio.html) · **Docs:** [Docs](https://codesphere-u.github.io/ai-wrapped/docs.html) · **Archetypes & Rules:** [Catalog](https://codesphere-u.github.io/ai-wrapped/rules.html)
+
 [![CI](https://github.com/codesphere-u/ai-wrapped/actions/workflows/ci.yml/badge.svg)](https://github.com/codesphere-u/ai-wrapped/actions/workflows/ci.yml)
+[![Release v1.1.0](https://img.shields.io/badge/release-v1.1.0-eab308.svg)](https://github.com/codesphere-u/ai-wrapped/releases/tag/v1.1.0)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 
@@ -17,7 +20,7 @@ Zero API keys. Zero external libraries. Works in 2 seconds for **both non-develo
 | **Interactive Wrapped Story + Bento View (`ai-wrapped.html`)** | Animated 7-card story deck + switchable overview with SVG charts, share button, and PDF export | Open in any browser offline—screenshot your **AI Archetype Card** for X, LinkedIn, or friends |
 | **Novel-Scale Volume & Streaking** | Counts total conversations, prompts, words written (*"1.4x The Great Gatsby"*), streaks & peak day | See how much you actually wrote to AI this year |
 | **2 AM Rabbit-Hole Clock** | 24-hour circadian chart + late-night session percentage | Reveals when your weirdest brainstorms happen |
-| **Politeness vs. AI Cliché Mirror** | Scores your `"please"`/`"thank you"` ratio vs. `"!!!"` AND counts how many `"Great question!"` / `"delve"` clichés AI fed you | Instant viral screenshot bait with receipts |
+| **Politeness vs. AI Cliché Mirror** | Scores your `"please"`/`"thank you"` ratio vs. `"!!!"` AND counts how many `"Great question!"` / `"Certainly!"` clichés AI fed you | Instant viral screenshot bait with receipts |
 | **Buried Ideas Resurfacer** | Surfaces forgotten multi-turn plans, trips, side projects & goals buried in old threads | Recover winning ideas you dropped months ago |
 | **Portable AI Brain (`BRAIN_PORTABLE.md`)** | Extracts formatting preferences, recurring obsessions, and open projects cleanly | Switch between ChatGPT, Claude, Gemini, or Cursor in 10 seconds |
 | **Screenshot-Safe Privacy Shield** | Streams ZIPs in-memory + auto-masks `sk-`/`ghp_` API keys, emails, and SSNs/cards | Zero cloud uploads and safe to share screenshots |
@@ -103,6 +106,11 @@ ai-wrapped ~/Documents/my-ai-exports --output-dir my-wrapped
 - **Google Gemini**: **takeout.google.com** -> select **My Activity -> Gemini Apps** (`.zip`, `MyActivity.json`, or `My Activity.html`)
 
 Full format & privacy breakdown: [`skills/ai-wrapped/references/privacy-and-formats.md`](skills/ai-wrapped/references/privacy-and-formats.md)
+
+### Documentation Guides
+- [Getting Started & CLI Reference](docs/GETTING_STARTED.md)
+- [Export Formats & Offline Privacy Architecture](docs/EXPORT_AND_PRIVACY.md)
+- [Web Docs & Interactive Studio](https://codesphere-u.github.io/ai-wrapped/docs.html)
 
 ---
 
